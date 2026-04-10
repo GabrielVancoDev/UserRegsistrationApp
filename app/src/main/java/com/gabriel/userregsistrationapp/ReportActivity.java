@@ -1,43 +1,88 @@
 package com.gabriel.userregsistrationapp;
 
-// Importações de Componentes de UI, intenções e a biblioteca
+// Importação das classes necessárias para a funcionalidade do aplicativo
 import android.content.Intent;
 import android.os.Bundle;
+// import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+// import java.util.List;
 
-public class ReportActivity extends AppCompatActivity {
+//Classe para verificar erros com Log
+import android.util.Log;
 
-    private TextView textViewReport;
 
+// Classe principal da atividade de cadastro de usuários
+public class MainActivity extends AppCompatActivity {
+    // Declaração dos campos de entrada de dados
+    private EditText editTextName, editTextCPF, editTextEmail, editTextPhone;
+
+    // Objeto para interagir com o banco de dados (DAO)
+    private UserDao userDao;
+
+    // Método chamado quando a atividade é criada
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Define o Layout XML dessa tela de relatório
-        setContentView(R.layout.activity_report);
-        // mapeamento do TextView do XML para o Java
-        textViewReport =  findViewById(R.id.textViewReport);
-        // Encontra o Botão e define o clique para enviar
-        Button btnVoltar = findViewById(R.id.btnVoltar);
-        // O Botão de Retorno Utilizando expressao lamdda
-        btnVoltar.setOnClickListener(v-> voltarParaCadastro());
+        setContentView(R.layout.activity_main); // Define o layout da tela
 
-        /* Conexão com o banco de dados
-        1- Cria uma instância do banco "user-database"]
-        2-.allowMainThreadQueries(): Serve para liberar operações de consulta feitas em threads da UI.
-        Por padrão, ROOM proíbe isso. O correto seria fazer consultas em threads separadas
-         */
+        // Inicializa os campos de entrada de dados do layout
+        editTextName = findViewById(R.id.editTextName);
+        editTextCPF = findViewById(R.id.editTextCPF);
+        editTextEmail = findViewById(R.id.editTextEmail);
+        editTextPhone = findViewById(R.id.editTextPhone);
 
-    }
+        // Inicializa os botões do layout
+        Button buttonSave = findViewById(R.id.buttonSave);
+        Button buttonReport = findViewById(R.id.buttonReport);
+
+        // Configuração do banco de dados usando Room
+        UserDatabase db = Room.databaseBuilder(getApplicationContext(),
+                UserDatabase.class, "user-database").allowMainThreadQueries().build();
+        userDao = db.userDao(); // Obtém uma instância do DAO para interagir com os dados
+
+        // Configura o botão de salvar usuário
+        buttonSave.setOnClickListener(v -> {
+            // Confirma que o clique ocorreu
+            Log.d("MainActivity", "Botão Cadastrar Usuário clicado!");
+
+            // Obtém os valores digitados pelo usuário
+            String name = editTextName.getText().toString();
+            String cpf = editTextCPF.getText().toString();
+            String email = editTextEmail.getText().toString();
+            String phone = editTextPhone.getText().toString();
 
 
-    // Método Responsável pela Navegação entre as telas do app
-    public void voltarParaCadastro(){
-        // Intenção para abrir a tela de cadasstro
-        Intent intent = new Intent(ReportActivity.this, MainActivity.class);
-        startActivity(intent);
-        // Fecha a tela de relatório para não acumular uma pilha de tarefas
-        finish();
+            // Verifica se os valores estão sendo capturados corretamente
+            Log.d("MainActivity", "Nome: " + name + ", CPF: " + cpf + ", Email: " + email + ", Telefone: " + phone);
+
+            // Verifica se os campos obrigatórios (Nome e CPF) foram preenchidos
+            if (!name.isEmpty() && !cpf.isEmpty()) {
+                // Cria um novo objeto usuário e insere no banco de dados
+                User user = new User(name, cpf, email, phone);
+                userDao.insert(user);
+
+                // Confirma a inserção
+                Log.d("MainActivity", "Usuário inserido no banco de dados.");
+
+                // Exibe uma mensagem confirmando o cadastro
+                Toast.makeText(MainActivity.this, "Usuário cadastrado!", Toast.LENGTH_SHORT).show();
+            } else {
+
+                // Mostra erro se os campos estiverem vazios
+                Log.d("MainActivity", "Erro: Campos obrigatórios vazios!");
+
+                // Exibe uma mensagem de erro se os campos obrigatórios não forem preenchidos
+                Toast.makeText(MainActivity.this, "Preencha os campos obrigatórios!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Configura o botão de relatório para abrir a tela de relatório
+        buttonReport.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, ReportActivity.class))
+        );
     }
 }
