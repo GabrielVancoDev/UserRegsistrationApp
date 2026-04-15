@@ -3,7 +3,7 @@ package com.gabriel.userregsistrationapp;
 import android.content.Context;
 
 import androidx.room.Database; //Notação para marcar a classe como um banco de dados Room
-import androidx.room.RoomDatabase // Classe base que representa o BD
+import androidx.room.RoomDatabase; // Classe base que representa o BD
 public class UserDatabase {
     @Database(entities = {User.class}, version = 1)
     public abstract class UserDatabase extends RoomDatabase {

@@ -1,10 +1,10 @@
 package com.gabriel.userregsistrationapp;
 
-import androidx.room3.Dao;
-import androidx.room3.Entity;
-import androidx.room3.Insert;
-import androidx.room3.PrimaryKey;
-import androidx.room3.Query;
+import androidx.room.Dao;
+import androidx.room.Entity;
+import androidx.room.Insert;
+import androidx.room.PrimaryKey;
+import androidx.room.Query;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class User {
 
         //Metodo para buscar todo os usuarios cadastrados no BD
         //A anotação @Query permite definir uma consulta sql personalizada
-        @Query("SELECT * FROM user")
+        @Query("SELECT * FROM User")
         List<User> getAllUsers();
     }
 
